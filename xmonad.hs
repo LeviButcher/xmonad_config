@@ -10,6 +10,7 @@ import XMonad.Hooks.StatusBar.PP
 import XMonad.Util.Loggers
 import XMonad.Hooks.ManageHelpers
 import XMonad.Layout.Renamed
+import XMonad.Layout.Spacing
 
 main :: IO ()
 main = xmonad 
@@ -17,13 +18,14 @@ main = xmonad
     . withEasySB (statusBarProp "xmobar" (pure myXmobarPP)) defToggleStrutsKey
     $ myConfig
 
+layoutSpacing = 5
 
 myConfig = def {
     modMask = mod4Mask,
     terminal = "alacritty",
     normalBorderColor = "#D3D3D3",
     focusedBorderColor = "#1F51FF",
-    layoutHook = myLayout,
+    layoutHook = spacingWithEdge layoutSpacing $ myLayout,
     manageHook = manageHook def <+> myManageHook,
     workspaces = ["info", "dev", "web", "media"] <+> (show <$> [5..9])
   }
@@ -53,7 +55,7 @@ myXmobarPP :: PP
 myXmobarPP = def
     { ppSep             = magenta " • "
     , ppTitleSanitize   = xmobarStrip
-    , ppCurrent         = wrap " " "" . xmobarBorder "Top" "#8be9fd" 2
+    , ppCurrent         = wrap " " " " . green 
     , ppHidden          = white . wrap " " ""
     , ppHiddenNoWindows = lowWhite . wrap " " ""
     , ppUrgent          = red . wrap (yellow "!") (yellow "!")
@@ -62,18 +64,19 @@ myXmobarPP = def
     }
   where
     formatFocused   = wrap (white    "[") (white    "]") . magenta . ppWindow
-    formatUnfocused = wrap (lowWhite "[") (lowWhite "]") . blue    . ppWindow
+    formatUnfocused = wrap (lowWhite "[") (lowWhite "]") . blue . ppWindow
 
     -- | Windows should have *some* title, which should not not exceed a
     -- sane length.
     ppWindow :: String -> String
     ppWindow = xmobarRaw . (\w -> if null w then "untitled" else w) . shorten 30
 
-    blue, lowWhite, magenta, red, white, yellow :: String -> String
+    green, blue, lowWhite, magenta, red, white, yellow :: String -> String
     magenta  = xmobarColor "#ff79c6" ""
-    blue     = xmobarColor "#bd93f9" ""
+    blue     = xmobarColor "#4469e3" ""
     white    = xmobarColor "#f8f8f2" ""
     yellow   = xmobarColor "#f1fa8c" ""
     red      = xmobarColor "#ff5555" ""
     lowWhite = xmobarColor "#bbbbbb" ""
+    green = xmobarColor "#44e35c" ""
 
